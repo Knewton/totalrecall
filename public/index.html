@@ -1,0 +1,11 @@
+<!doctype html>
+<html><head></head><body>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+        var socket = io.connect('http://localhost');
+        socket.on('test', function (data) {
+            console.log(data);
+        });
+	</script>
+</body>
+</html>
