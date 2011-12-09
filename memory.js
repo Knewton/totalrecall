@@ -151,7 +151,7 @@ io.sockets.on('connection', function (socket) {
                                             unlucky_sod_socket = io.sockets.sockets[unlucky_sod];
                                             unlucky_sod_socket.get('flipped', function (err, unlucky_flipped) {
                                                 var flipback = Math.ceil(Math.random() * unlucky_flipped.length - 1),
-                                                    flipped_back_card = unlucky_flipped[flipback],
+                                                    flipped_back_pair = unlucky_flipped[flipback],
                                                     new_flipback = [];
 
                                                 unlucky_flipped.forEach(function (v, i) {
@@ -161,18 +161,17 @@ io.sockets.on('connection', function (socket) {
                                                 });
 
                                                 unlucky_sod_socket.set('flipped', new_flipback, function () {
-                                                    unlucky_sod_socket.emit('card-flipback', {flipback: [flipped_back_card]});
+                                                    unlucky_sod_socket.emit('card-flipback', {flipback: flipped_back_pair});
                                                 });
                                             });
                                         }
 
                                         // Tell the client what to flip
                                         socket.emit('card-flipped', {
-                                            identity: card_identity,
                                             flipover: [
                                                 // Don't flip the previously clicked card, it's already flipped
                                                 // [checking.x, checking.y],
-                                                [data.x, data.y]
+                                                [data.x, data.y, card_identity]
                                             ]
                                         });
                                     });
@@ -193,12 +192,9 @@ io.sockets.on('connection', function (socket) {
                             x: data.x,
                             y: data.y
                         }, function () {
-                            socket.emit('card-flipped', {
-                                identity: card_identity,
-                                flipover: [
-                                    [data.x, data.y]
-                                ]
-                            });
+                            socket.emit('card-flipped', {flipover: [
+                                [data.x, data.y, card_identity]
+                            ]});
                         });
                     }
                 });
