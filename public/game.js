@@ -58,14 +58,23 @@
      * Create the game board.
      * @param {number} cards The number of cards for the board.
      */
-    function generateBoard(cards) {
-        var index = 0,
-            markup = [];
-        for (; index < cards; index++) {
-            markup.push("div.card", [
+    function generateBoard() {
+        var markup = [],
+            x = 0,
+            y = 0;
+        while (true) {
+            markup.push(KOI.format("div.card.x{}.y{}", x, y), [
                 "a.front.koi-event[rel=flip]", 
-                "span.back"
+                "div.back"
             ]);
+            x += 1;
+            if (x === DIMENSION[0]) {
+                x = 0;
+                y += 1;
+            }
+            if (y === DIMENSION[1]) {
+                break;
+            }
         }
         KOI.getElements("#cards").appendChild(KOI.markup(markup));
     }
@@ -106,6 +115,40 @@
         }
     }
 
+    /**
+     * Get the dimensions for the provided element.
+     * @param {HTMLElement} e The element.
+     */
+    function getDimensions(e) {
+        var dim = [];
+        KOI.each(e.className.split(" "), function (index, cls) {
+            if (cls[0] === "x") {
+                dim[0] = parseInt(cls.substr(1), 10);
+            }
+            if (cls[0] === "y") {
+                dim[1] = parseInt(cls.substr(1), 10);
+            }
+        });
+        return dim;
+    }
+
+    /**
+     * Flip a card.
+     * @param {Array<int>} dim The dimensions.
+     */
+    function flipCard(dim) {
+        socket.emit("flip-card", {
+            x: dim[0],
+            y: dim[1]
+        });
+        //KOI.processors.classes(e.parentElement, "flip");
+    }
+
+    //------------------------------
+    // 
+    //------------------------------
+
+
     //------------------------------
     //
     // Event bindings
@@ -136,13 +179,15 @@
     //------------------------------
     // Game
     //------------------------------
-    
+
     /**
      * Flip over a card.
      * @param {HTMLElement} The element being clicked.
      */
     KOI.bind("flip", function (e) {
-        KOI.processors.classes(e.parentElement, "flip");
+        e = e.parentElement;
+        var dimensions = getDimensions(e);
+        flipCard(dimensions);
     });
 
     //------------------------------
@@ -154,10 +199,18 @@
      * @param {Object} The game info.
      */
     socket.on("game-info", function (data) {
-        generateBoard(24);
+        generateBoard();
         KOI.processors.text(KOI.getElements("#title"), data.name);
         KOI.processors.classes(KOI.getElements("#join"), "hide");
         KOI.processors.classes(KOI.getElements("#cards"));
+    });
+
+    /**
+     * Get the flip info.
+     * @param {Object} The game state.
+     */
+    socket.on("card-flipped", function (data) {
+        console.log(data.identity);  
     });
 
     //------------------------------
@@ -186,7 +239,7 @@
             KOI.processors.text(KOI.getElements("#title"), "Total Recall");
             KOI.getElements("#game").setAttribute("value", "Knewton");
             usernameField.focus();
-            KOI.processors.classes(KOI.getElements("#join"), "hide");
+            KOI.processors.classes(KOI.getElements("#join"));
         }
     });
 
