@@ -107,7 +107,7 @@
         enableForm(false);
         socket.emit("enter-game", {
             name: game,
-            player: username
+            player: username + (new Date()).valueOf()
         });
         if (Boolean(remember)) {
             storage.set("username", username);
@@ -210,7 +210,11 @@
      * @param {Object} The game state.
      */
     socket.on("card-flipped", function (data) {
-        console.log(data.identity);  
+        console.log("Flip", data);
+    });
+
+    socket.on("card-flipback", function (data) {
+        console.log("Flipback", data);
     });
 
     //------------------------------
