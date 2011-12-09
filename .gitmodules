@@ -1,0 +1,3 @@
+[submodule "public/Koi-Framework"]
+	path = public/Koi-Framework
+	url = git://github.com/Knewton/Koi-Framework.git
