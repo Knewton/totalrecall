@@ -122,10 +122,10 @@ io.sockets.on('connection', function (socket) {
                              * 5. Send back the cards that should flip over
                              */
                             socket.get('flipped', function (err, flipped) {
-                                flipped.push(
+                                flipped.push([
                                     [checking.x, checking.y],
                                     [data.x, data.y]
-                                );
+                                ]);
 
                                 socket.set('flipped', flipped, function () {
                                     socket.set('checking', null, function () {
@@ -134,7 +134,37 @@ io.sockets.on('connection', function (socket) {
 
                                         socket.broadcast.to(game).emit(player + " got a point!");
 
-                                        // TODO: Flip back another player!
+                                        // Evil code: pick a random other player and a random flipped pair
+                                        var candidates = [],
+                                            unlucky_sod = socket.id,
+                                            unlucky_sod_socket,
+                                            id;
+
+                                        for (id in io.sockets.sockets) {
+                                            if (io.sockets.sockets.hasOwnProperty(id) && id !== socket.id) {
+                                                candidates.push(id);
+                                            }
+                                        }
+
+                                        if (candidates.length) {
+                                            unlucky_sod = candidates[Math.ceil(Math.random() * candidates.length - 1)];
+                                            unlucky_sod_socket = io.sockets.sockets[unlucky_sod];
+                                            unlucky_sod_socket.get('flipped', function (err, unlucky_flipped) {
+                                                var flipback = Math.ceil(Math.random() * unlucky_flipped.length - 1),
+                                                    flipped_back_card = unlucky_flipped[flipback],
+                                                    new_flipback = [];
+
+                                                unlucky_flipped.forEach(function (v, i) {
+                                                    if (i !== flipback) {
+                                                        new_flipback.push(v);
+                                                    }
+                                                });
+
+                                                unlucky_sod_socket.set('flipped', new_flipback, function () {
+                                                    unlucky_sod_socket.emit('card-flipback', {flipback: [flipped_back_card]});
+                                                });
+                                            });
+                                        }
 
                                         // Tell the client what to flip
                                         socket.emit('card-flipped', {
