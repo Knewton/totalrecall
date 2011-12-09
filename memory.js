@@ -180,9 +180,15 @@ io.sockets.on('connection', function (socket) {
                         } else {
                             // Player failed to match. Flip back!
                             socket.set('checking', null, function () {
-                                socket.emit("card-flipback", {flipback: [
-                                    [checking.x, checking.y]
-                                ]});
+                                socket.emit("card-flipback", {
+                                    flipover: [
+                                        [data.x, data.y, card_identity]
+                                    ],
+                                    flipback: [
+                                        [data.x, data.y],
+                                        [checking.x, checking.y]
+                                    ]
+                                });
                             });
                         }
                     } else {

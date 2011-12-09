@@ -1,6 +1,7 @@
 /* Colors
 ----------------------------------*/
 .skin-colors .card .back { background-color: #000; }
+.skin-colors .card-0 .front { background-color: #CCC; }
 .skin-colors .card-1 .front { background-color: #F00; }
 .skin-colors .card-2 .front { background-color: #0F0; }
 .skin-colors .card-3 .front { background-color: #00F; }
@@ -8,4 +9,3 @@
 .skin-colors .card-5 .front { background-color: #F0F; }
 .skin-colors .card-6 .front { background-color: #FFF; }
 .skin-colors .card-7 .front { background-color: #0FF; }
-.skin-colors .card-8 .front { background-color: #C0C; }

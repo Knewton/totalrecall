@@ -76,7 +76,7 @@ input {
     -moz-perspective: 600;
 }
 
-.card .front {
+.card .back {
     float: none;
     position: absolute;
     top: 0;
@@ -94,11 +94,11 @@ input {
 
     -webkit-transform: rotateY(0deg);
     -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
+    -webkit-frontface-visibility: hidden;
 
     -moz-transform: rotateY(0deg);
     -moz-transform-style: preserve-3d;
-    -moz-backface-visibility: hidden;
+    -moz-frontface-visibility: hidden;
 
     /* -- transition is the magic sauce for animation -- */
     -o-transition: all .4s ease-in-out;
@@ -107,7 +107,7 @@ input {
     -webkit-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
 }
-.card.flip .front {
+.card.flip .back {
     z-index: 900;
     border-color: #eee;
 
@@ -119,7 +119,7 @@ input {
     box-shadow: 0 15px 50px rgba(0,0,0,0.2);
 }
 
-.card .back {
+.card .front {
     float: none;
     position: absolute;
     top: 0;
@@ -133,11 +133,11 @@ input {
 
     -webkit-transform: rotateY(-180deg);
     -webkit-transform-style: preserve-3d;
-    -webkit-backface-visibility: hidden;
+    -webkit-frontface-visibility: hidden;
 
     -moz-transform: rotateY(-180deg);
     -moz-transform-style: preserve-3d;
-    -moz-backface-visibility: hidden;
+    -moz-frontface-visibility: hidden;
 
     /* -- transition is the magic sauce for animation -- */
     -o-transition: all .4s ease-in-out;
@@ -147,7 +147,7 @@ input {
     transition: all .4s ease-in-out;
 }
 
-.card.flip .back {
+.card.flip .front {
     z-index: 1000;
 
     -webkit-transform: rotateY(0deg);

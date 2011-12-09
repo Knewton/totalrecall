@@ -63,9 +63,9 @@
             x = 0,
             y = 0;
         while (true) {
-            markup.push(KOI.format("div.card.x{}.y{}", x, y), [
-                "a.front.koi-event[rel=flip]", 
-                "div.back"
+            markup.push(KOI.format("div.card#x{}-y{}", x, y), [
+                "a.back.koi-event[rel=flip]", 
+                "div.front"
             ]);
             x += 1;
             if (x === DIMENSION[0]) {
@@ -120,16 +120,8 @@
      * @param {HTMLElement} e The element.
      */
     function getDimensions(e) {
-        var dim = [];
-        KOI.each(e.className.split(" "), function (index, cls) {
-            if (cls[0] === "x") {
-                dim[0] = parseInt(cls.substr(1), 10);
-            }
-            if (cls[0] === "y") {
-                dim[1] = parseInt(cls.substr(1), 10);
-            }
-        });
-        return dim;
+        var d = e.id.split("-");
+        return [parseInt(d[0].substr(1), 10), parseInt(d[1].substr(1), 10)];
     }
 
     /**
@@ -141,13 +133,20 @@
             x: dim[0],
             y: dim[1]
         });
-        //KOI.processors.classes(e.parentElement, "flip");
     }
 
-    //------------------------------
-    // 
-    //------------------------------
-
+    /**
+     * Flip a set of cards.
+     * @param {Array<int>} cards The cards to flip.
+     * @param {boolean} unflip Unflip the cards? Default false.
+     */
+    function flip(cards, unflip) {
+        KOI.each(cards, function (index, card) {
+            KOI.processors.classes(
+                KOI.getElements(KOI.format("#x{}-y{}", card[0], card[1])), 
+                unflip ? "" : KOI.format("flip card-{}", card[2]));
+        });
+    }
 
     //------------------------------
     //
@@ -167,10 +166,10 @@
         KOI.stopEvent(event);
         var username = KOI.getElements("#username").value,
             game = KOI.getElements("#game").value;
-        if (KOI.isEmpty(username.value)) {
+        if (KOI.isEmpty(username)) {
             return alert("You must enter a username");
         }
-        if (KOI.isEmpty(game.value)) {
+        if (KOI.isEmpty(game)) {
             return alert("You must enter a game");
         }
         joinGame(username, game, true);
@@ -200,7 +199,8 @@
      */
     socket.on("game-info", function (data) {
         generateBoard();
-        KOI.processors.text(KOI.getElements("#title"), data.name);
+        KOI.processors.text(KOI.getElements("#title"), 
+            KOI.format("[{}] Total Recall", data.name));
         KOI.processors.classes(KOI.getElements("#join"), "hide");
         KOI.processors.classes(KOI.getElements("#cards"));
     });
@@ -210,11 +210,18 @@
      * @param {Object} The game state.
      */
     socket.on("card-flipped", function (data) {
-        console.log("Flip", data);
+        flip(data.flipover);
     });
 
     socket.on("card-flipback", function (data) {
-        console.log("Flipback", data);
+        if (KOI.isValid(data.flipover)) {
+            flip(data.flipover);
+            setTimeout(function () {
+                flip(data.flipback, true);
+            }, 500);
+        } else {
+            flip(data.flipback, true);
+        }
     });
 
     //------------------------------
@@ -225,26 +232,11 @@
      * Setup the game.
      */
     KOI.bind("DOMReady", function () {
-        KOI.processors.classes(KOI.getElements("#join"), "hide");
         KOI.processors.classes(KOI.getElements("#cards"), "hide");
         KOI.listen(KOI.getElements("#join"), "submit", joinSubmitHandler);
-
-        var username = storage.get("username"),
-            game = storage.get("game"),
-            usernameField = KOI.getElements("#username");
-
-        if (KOI.isValid(username)) {
-            if (KOI.isValid(game)) {
-                joinGame(username, game);
-            } else {
-                usernamefield.setAttribute("value", username);
-            }
-        } else {
-            KOI.processors.text(KOI.getElements("#title"), "Total Recall");
-            KOI.getElements("#game").setAttribute("value", "Knewton");
-            usernameField.focus();
-            KOI.processors.classes(KOI.getElements("#join"));
-        }
+        KOI.processors.text(KOI.getElements("#title"), "Total Recall");
+        KOI.getElements("#game").setAttribute("value", "Knewton");
+        KOI.getElements("#username").focus();
     });
 
     //------------------------------
