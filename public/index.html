@@ -1,11 +1,31 @@
 <!doctype html>
-<html><head></head><body>
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript">
-        var socket = io.connect('http://localhost');
-        socket.on('test', function (data) {
-            console.log(data);
-        });
-	</script>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Total Recall</title>
+	<meta name="description" content="">
+  	<meta name="author" content="">
+
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<link rel="stylesheet" href="reset.css" type="text/css" media="screen" charset="utf-8">
+	<link rel="stylesheet" href="game.css" type="text/css" media="screen" charset="utf-8">
+	<link rel="stylesheet" href="cards.css" type="text/css" media="screen" charset="utf-8">
+	<script src="Koi-Framework/src/koi-core/koi-core.js" type="text/javascript" charset="utf-8"></script>
+	<script src="Koi-Framework/src/koi-event/koi-event.js" type="text/javascript" charset="utf-8"></script>
+	<script src="Koi-Framework/src/koi-markup/koi-markup.js" type="text/javascript" charset="utf-8"></script>
+	<script src="Koi-Framework/src/koi-update/koi-update.js" type="text/javascript" charset="utf-8"></script>
+	<script src="game.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body class="skin-colors">
+	<div id="wrapper">
+		<h1>Total Recall</h1>
+		<div id="cards"></div>
+	</div>
 </body>
 </html>
+
