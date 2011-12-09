@@ -15,16 +15,31 @@
 	<link rel="stylesheet" href="reset.css" type="text/css" media="screen" charset="utf-8">
 	<link rel="stylesheet" href="game.css" type="text/css" media="screen" charset="utf-8">
 	<link rel="stylesheet" href="cards.css" type="text/css" media="screen" charset="utf-8">
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>	
 	<script src="Koi-Framework/src/koi-core/koi-core.js" type="text/javascript" charset="utf-8"></script>
 	<script src="Koi-Framework/src/koi-event/koi-event.js" type="text/javascript" charset="utf-8"></script>
 	<script src="Koi-Framework/src/koi-markup/koi-markup.js" type="text/javascript" charset="utf-8"></script>
 	<script src="Koi-Framework/src/koi-update/koi-update.js" type="text/javascript" charset="utf-8"></script>
+	<script src="store.js" type="text/javascript" charset="utf-8"></script>
 	<script src="game.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body class="skin-colors">
 	<div id="wrapper">
-		<h1>Total Recall</h1>
+		<h1 id="title"></h1>
 		<div id="cards"></div>
+		<form id="join" action="#" method="post">
+			<div class="form-section">
+				<label>Username</label>
+				<input type="text" id="username" class="form-field" />
+			</div>
+			<div class="form-section">
+				<label for="game">Game to join</label>
+				<input type="text" id="game" class="form-field" />
+			</div>
+			<div class="form-section clearfix">
+				<button type="submit" class="form-field button">Join Game</button>
+			</div>
+		</form>
 	</div>
 </body>
 </html>

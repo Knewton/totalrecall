@@ -1,3 +1,14 @@
+/**
+ * Total recall styles
+ *
+ * Copyright (c) 2010 Knewton
+ * Dual licensed under:
+ *   MIT: http://www.opensource.org/licenses/mit-license.php
+ *   GPLv3: http://www.opensource.org/licenses/gpl-3.0.html
+ */
+
+/* Game
+----------------------------------*/
 #wrapper {
 	width: 960px;
 	margin: 15px auto 0;
@@ -9,6 +20,52 @@ h1 {
 	margin-bottom: 20px;
 }
 
+/* System
+----------------------------------*/
+body .hide {
+    display: none;
+}
+
+/* Form
+----------------------------------*/
+#join {
+    width: 190px;
+    padding: 40px 0 30px 35px;
+    background: #EEE;
+    margin: 0 auto;
+    border: 1px solid #000;
+}
+
+.form-section { 
+    margin-bottom: 10px;
+}
+
+.button {
+    float: left;
+    padding: 10px 20px;
+    background: #4D90FE;
+    text-decoration: none;
+    font: bold 20px/24px Verdana;
+    color: #FFF;
+    margin: 0;
+    border: none;
+}
+
+label {
+    display: block;
+    font: bold 10px/14px Verdana;
+    text-transform: uppercase;
+}
+
+input {
+    width: 140px;
+    border: 1px solid #000;
+    font: 15px/10px Tahoma;
+    padding: 3px 5px;
+}
+
+/* Board
+----------------------------------*/
 .card {
 	width: 150px;
 	height: 240px;
