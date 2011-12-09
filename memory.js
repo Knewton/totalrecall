@@ -169,6 +169,9 @@ io.sockets.on('connection', function (socket) {
                                             unlucky_sod = candidates[Math.ceil(Math.random() * candidates.length - 1)];
                                             unlucky_sod_socket = io.sockets.sockets[unlucky_sod];
                                             unlucky_sod_socket.get('flipped', function (err, unlucky_flipped) {
+                                                if (unlucky_flipped === null) {
+                                                    return;
+                                                }
                                                 var flipback = Math.ceil(Math.random() * unlucky_flipped.length - 1),
                                                     flipped_back_pair = unlucky_flipped[flipback],
                                                     new_flipback = [];

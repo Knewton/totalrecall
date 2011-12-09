@@ -75,7 +75,6 @@ input {
     -webkit-perspective: 600;
     -moz-perspective: 600;
 }
-
 .card .back {
     float: none;
     position: absolute;

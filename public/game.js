@@ -63,10 +63,11 @@
             x = 0,
             y = 0;
         while (true) {
-            markup.push(KOI.format("div.card#x{}-y{}", x, y), [
-                "a.back.koi-event[rel=flip]", 
-                "div.front"
-            ]);
+            markup.push(
+                KOI.format("a.card.koi-event[rel=flip]#x{}-y{}", x, y), [
+                    "span.back", "span.front"
+                ]
+            );
             x += 1;
             if (x === DIMENSION[0]) {
                 x = 0;
@@ -184,9 +185,10 @@
      * @param {HTMLElement} The element being clicked.
      */
     KOI.bind("flip", function (e) {
-        e = e.parentElement;
-        var dimensions = getDimensions(e);
-        flipCard(dimensions);
+        if (!KOI.hasClass(e, "flip")) {
+            var dimensions = getDimensions(e);
+            flipCard(dimensions);
+        }
     });
 
     //------------------------------
