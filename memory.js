@@ -5,8 +5,7 @@ var express = require('express'),
     io = require('socket.io').listen(app),
 
     // Data
-    games = {}
-;
+    games = {};
 
 /**
  * Returns a two-dimensional array of cards to start off a game.
@@ -58,6 +57,24 @@ app.listen(3000);
 
 io.sockets.on('connection', function (socket) {
 
+    socket.on('disconnect', function () {
+        socket.get('name', function (err, player) {
+            socket.get('game', function (err, game) {
+                socket.leave(game);
+                socket.broadcast.to(game).emit(player + " left the game.");
+
+                var new_players = {};
+                for (player_name in games[game].exposed.players) {
+                    if (games[game].exposed.players.hasOwnProperty(player_name) && player_name !== player) {
+                        new_players[player_name] = games[game].exposed.players[player_name];
+                    }
+                }
+
+                games[game].exposed.players = new_players;
+            });
+        });
+    });
+
     // Player entered the game.
     socket.on('enter-game', function (data) {
         data.name = 'game_' + data.name;
@@ -95,7 +112,9 @@ io.sockets.on('connection', function (socket) {
         socket.join(data.name);
 
         // Return data
-        socket.emit('game-info', games[data.name].exposed);
+        var exposed = games[data.name].exposed;
+        exposed.name = exposed.name.slice(5);
+        socket.emit('game-info', exposed);
     });
 
     // Player flips a card.
