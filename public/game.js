@@ -36,7 +36,7 @@
          * The socket connection.
          * @type {Socket}
          */
-        socket = io.connect('http://localhost'),
+        socket = io.connect(window.location.toString()),
 
         /**
          * The player settings.
