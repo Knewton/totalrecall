@@ -10,14 +10,41 @@ var express = require('express'),
 
 /**
  * Returns a two-dimensional array of cards to start off a game.
+ *
+ * Currently assumes that there are always four rows. Bad things could happen if
+ * that isn't the case.
  */
-function generateCards(pairs) {
-    // TODO: make this random, just a test for now
-    return [[1, 1, 2, 2, 3, 3],
-            [4, 4, 5, 5, 6, 6],
-            [7, 7, 8, 8, 1, 1],
-            [2, 2, 3, 3, 4, 4]];
+function generateCards(types, pairs) {
+    var contents = [],
+        adding_pair,
+        result = [],
+        i = 0,
+        x = (pairs * 2 / 4) - 1,
+        y = 4 - 1;
 
+    for (i = 0; i < pairs; i++) {
+        adding_pair = Math.floor(Math.random() * (types - 0) + 0);
+        contents.push(adding_pair, adding_pair);
+    }
+
+    contents.sort(function(a, b) {return 0.5 - Math.random();});
+
+    for (i = 0; i <= x; i++) {
+        result.push([]);
+    }
+
+    i = 0;
+    while (x >= 0) {
+        y = 4 - 1;
+        while (y >= 0) {
+            result[x].push(contents[i]);
+            i++;
+            y--;
+        }
+        x--;
+    }
+
+    return result;
 }
 
 function getCard(game, coords) {
@@ -30,6 +57,8 @@ app.use(express.static(__dirname + '/public'));
 app.listen(3000);
 
 io.sockets.on('connection', function (socket) {
+
+    // Player entered the game.
     socket.on('enter-game', function (data) {
         data.name = 'game_' + data.name;
 
@@ -42,7 +71,8 @@ io.sockets.on('connection', function (socket) {
                     players: {}
                 },
                 hidden: {
-                    cards: generateCards(8)
+                    cards: generateCards(8, 12),
+                    card_count: 24
                 }
             };
         }
@@ -62,6 +92,7 @@ io.sockets.on('connection', function (socket) {
         socket.emit('game-info', games[data.name].exposed);
     });
 
+    // Player flips a card.
     socket.on('flip-card', function (data) {
         socket.get('name', function (err, player) {
             socket.get('game', function (err, game) {
