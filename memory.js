@@ -77,6 +77,12 @@ io.sockets.on('connection', function (socket) {
             };
         }
 
+        // Player name is taken. Just stop.
+        if (data.player in games[data.name].exposed.players) {
+            socket.emit('error', "Player name " + player + " is taken.");
+            return;
+        }
+
         games[data.name].exposed.players[data.player] = 0;
 
         // Set player stats
@@ -103,7 +109,7 @@ io.sockets.on('connection', function (socket) {
                     if (checking !== null) {
 
                         if (checking.x === data.x && checking.y === data.y) {
-                            // User's playing a dirty trick, just shut up
+                            socket.emit("error", "You're already looking at that!");
                             return;
                         }
 
@@ -141,6 +147,13 @@ io.sockets.on('connection', function (socket) {
                                         });
                                     });
                                 });
+                            });
+                        } else {
+                            // Player failed to match. Flip back!
+                            socket.set('checking', null, function () {
+                                socket.emit("card-flipback", {flipback: [
+                                    [checking.x, checking.y]
+                                ]});
                             });
                         }
                     } else {
