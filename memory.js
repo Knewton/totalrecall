@@ -56,7 +56,7 @@ app.use(express.static(__dirname + '/public'));
 app.listen(3000);
 
 io.sockets.on('connection', function (socket) {
-
+/*
     socket.on('disconnect', function () {
         socket.get('name', function (err, player) {
             socket.get('game', function (err, game) {
@@ -74,7 +74,7 @@ io.sockets.on('connection', function (socket) {
             });
         });
     });
-
+*/
     // Player entered the game.
     socket.on('enter-game', function (data) {
         data.name = 'game_' + data.name;
@@ -113,7 +113,7 @@ io.sockets.on('connection', function (socket) {
 
         // Return data
         var exposed = games[data.name].exposed;
-        exposed.name = exposed.name.slice(5);
+        exposed.name = exposed.name.replace(/^game_/, '');
         socket.emit('game-info', exposed);
     });
 
