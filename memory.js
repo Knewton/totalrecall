@@ -103,10 +103,12 @@ io.sockets.on('connection', function (socket) {
         games[data.name].exposed.players[data.player] = 0;
 
         // Set player stats
-        socket.set('name', data.player);
-        socket.set('game', data.name);
-        socket.set('flipped', []);
-        socket.set('checking', null);
+        socket.set('stats', {
+            name: data.player,
+            game: data.name,
+            flipped: [],
+            checking: null
+        });
 
         // Join broadcasts for the game room
         socket.join(data.name);
@@ -119,114 +121,117 @@ io.sockets.on('connection', function (socket) {
 
     // Player flips a card.
     socket.on('flip-card', function (data) {
-        socket.get('name', function (err, player) {
-            socket.get('game', function (err, game) {
-                var card_identity = getCard(game, data);
+        socket.get('stats', function (err, stats) {
+            var card_identity = getCard(stats.game, data),
+                checking = stats.checking;
 
-                socket.get('checking', function (err, checking) {
-                    // There's already a flipped card, check if they match
-                    if (checking !== null) {
+            // There's already a flipped card, check if they match
+            if (stats.checking !== null) {
 
-                        if (checking.x === data.x && checking.y === data.y) {
-                            socket.emit("error", "You're already looking at that!");
-                            return;
+                if (stats.checking.x === data.x && stats.checking.y === data.y) {
+                    socket.emit("error", "You're already looking at that!");
+                    return;
+                }
+
+                if (card_identity === stats.checking.identity) {
+                    /* Card matches, so:
+                     * 1. Get flipped cards
+                     * 2. Add checked and newly checked to them
+                     * 3. Save flipped cards
+                     * 4. User gets a point
+                     * 5. Send back the cards that should flip over
+                     */
+                    stats.flipped.push([
+                        [stats.checking.x, stats.checking.y],
+                        [data.x, data.y]
+                    ]);
+
+                    stats.checking = null;
+
+                    socket.set('stats', stats, function () {
+                        // Player gets a point
+                        games[stats.game].exposed.players[stats.name]++;
+
+                        socket.broadcast.to(stats.game).emit(stats.name + " got a point!");
+
+                        // Evil code: pick a random other player and a random flipped pair
+                        var candidates = [],
+                            unlucky_sod = socket.id,
+                            unlucky_sod_socket,
+                            id;
+
+                        for (id in io.sockets.sockets) {
+                            if (io.sockets.sockets.hasOwnProperty(id) && id !== socket.id) {
+                                candidates.push(id);
+                            }
                         }
 
-                        if (card_identity === checking.identity) {
-                            /* Card matches, so:
-                             * 1. Get flipped cards
-                             * 2. Add checked and newly checked to them
-                             * 3. Save flipped cards
-                             * 4. User gets a point
-                             * 5. Send back the cards that should flip over
-                             */
-                            socket.get('flipped', function (err, flipped) {
-                                flipped.push([
-                                    [checking.x, checking.y],
-                                    [data.x, data.y]
-                                ]);
+                        if (candidates.length) {
+                            unlucky_sod = candidates[Math.ceil(Math.random() * candidates.length - 1)];
+                            unlucky_sod_socket = io.sockets.sockets[unlucky_sod];
+                            unlucky_sod_socket.get('stats', function (err, unlucky_stats) {
+                                if (unlucky_stats.flipped === null) {
+                                    return;
+                                }
 
-                                socket.set('flipped', flipped, function () {
-                                    socket.set('checking', null, function () {
-                                        // Player gets a point
-                                        games[game].exposed.players[player]++;
+                                var flipback = Math.ceil(Math.random() * unlucky_stats.flipped.length - 1),
+                                    flipped_back_pair = unlucky_stats.flipped[flipback],
+                                    new_flipback = [];
 
-                                        socket.broadcast.to(game).emit(player + " got a point!");
-
-                                        // Evil code: pick a random other player and a random flipped pair
-                                        var candidates = [],
-                                            unlucky_sod = socket.id,
-                                            unlucky_sod_socket,
-                                            id;
-
-                                        for (id in io.sockets.sockets) {
-                                            if (io.sockets.sockets.hasOwnProperty(id) && id !== socket.id) {
-                                                candidates.push(id);
-                                            }
-                                        }
-
-                                        if (candidates.length) {
-                                            unlucky_sod = candidates[Math.ceil(Math.random() * candidates.length - 1)];
-                                            unlucky_sod_socket = io.sockets.sockets[unlucky_sod];
-                                            unlucky_sod_socket.get('flipped', function (err, unlucky_flipped) {
-                                                if (unlucky_flipped === null) {
-                                                    return;
-                                                }
-                                                var flipback = Math.ceil(Math.random() * unlucky_flipped.length - 1),
-                                                    flipped_back_pair = unlucky_flipped[flipback],
-                                                    new_flipback = [];
-
-                                                unlucky_flipped.forEach(function (v, i) {
-                                                    if (i !== flipback) {
-                                                        new_flipback.push(v);
-                                                    }
-                                                });
-
-                                                unlucky_sod_socket.set('flipped', new_flipback, function () {
-                                                    unlucky_sod_socket.emit('card-flipback', {flipback: flipped_back_pair});
-                                                });
-                                            });
-                                        }
-
-                                        // Tell the client what to flip
-                                        socket.emit('card-flipped', {
-                                            flipover: [
-                                                // Don't flip the previously clicked card, it's already flipped
-                                                // [checking.x, checking.y],
-                                                [data.x, data.y, card_identity]
-                                            ]
-                                        });
-                                    });
+                                unlucky_stats.flipped.forEach(function (v, i) {
+                                    if (i !== flipback) {
+                                        new_flipback.push(v);
+                                    }
                                 });
-                            });
-                        } else {
-                            // Player failed to match. Flip back!
-                            socket.set('checking', null, function () {
-                                socket.emit("card-flipback", {
-                                    flipover: [
-                                        [data.x, data.y, card_identity]
-                                    ],
-                                    flipback: [
-                                        [data.x, data.y],
-                                        [checking.x, checking.y]
-                                    ]
+
+                                unlucky_stats.flipped = new_flipback;
+
+                                unlucky_sod_socket.set('stats', unlucky_stats, function () {
+                                    unlucky_sod_socket.emit('card-flipback', {flipback: flipped_back_pair});
                                 });
                             });
                         }
-                    } else {
-                        // Store checking since user clicked a first one
-                        socket.set('checking', {
-                            identity: card_identity,
-                            x: data.x,
-                            y: data.y
-                        }, function () {
-                            socket.emit('card-flipped', {flipover: [
+
+                        // Tell the client what to flip
+                        socket.emit('card-flipped', {
+                            flipover: [
+                                // Don't flip the previously clicked card, it's already flipped
+                                // [checking.x, checking.y],
                                 [data.x, data.y, card_identity]
-                            ]});
+                            ]
                         });
-                    }
+                    });
+                        
+                } else {
+                    stats.checking = null;
+
+                    // Player failed to match. Flip back!
+                    socket.set('stats', stats, function () {
+                        socket.emit("card-flipback", {
+                            flipover: [
+                                [data.x, data.y, card_identity]
+                            ],
+                            flipback: [
+                                [data.x, data.y],
+                                [checking.x, checking.y]
+                            ]
+                        });
+                    });
+                }
+            } else {
+                // Store checking since user clicked a first one
+                stats.checking = {
+                    identity: card_identity,
+                    x: data.x,
+                    y: data.y
+                };
+
+                socket.set('stats', stats, function () {
+                    socket.emit('card-flipped', {flipover: [
+                        [data.x, data.y, card_identity]
+                    ]});
                 });
-            });
+            }
         });
     });
 });
