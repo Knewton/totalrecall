@@ -221,6 +221,18 @@
      * @param {Object} data The game info.
      */
     socket.on("game-info", function (data) {
+        if (KOI.isValid(data.state.winner)) {
+            KOI.each(KOI.getElements("card"), function (index, e) {
+                KOI.processors.classes(e, "");
+            });
+            KOI.processors.classes(KOI.getElements("#winner"), "");     
+            KOI.processors.classes(KOI.getElements("#winner-screen"), "");     
+            KOI.processors.text(KOI.getElements("#winner-name"), 
+                data.state.winner);     
+        } else {
+            KOI.processors.classes(KOI.getElements("#winner"), "hide");     
+            KOI.processors.classes(KOI.getElements("#winner-screen"), "hide");     
+        }
         KOI.processors.text(KOI.getElements("#title"), 
             KOI.format("[{}] Total Recall", data.name));
         KOI.processors.classes(KOI.getElements("#join"), "hide");
@@ -279,6 +291,8 @@
      */
     KOI.bind("DOMReady", function () {
         generateBoard();
+        KOI.processors.classes(KOI.getElements("#winner"), "hide");     
+        KOI.processors.classes(KOI.getElements("#winner-screen"), "hide");     
         KOI.processors.classes(KOI.getElements("#cards"), "hide");
         KOI.listen(KOI.getElements("#join"), "submit", joinSubmitHandler);
         KOI.processors.text(KOI.getElements("#title"), "Total Recall");
