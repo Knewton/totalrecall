@@ -70,13 +70,23 @@ function playerIsVictorious(stats) {
 function handleVictory(socket, stats) {
     games[stats.game].exposed.state = {
         winner: stats.name,
-        next_game: new Date((Math.floor(new Date().getTime() / 1000) + 60) * 1000).valueOf() / 1000
+        next_game: new Date((Math.floor(new Date().getTime() / 1000) + 30) * 1000).valueOf() / 1000
     }
 
     // Send victory game info to both winner and everyone else
     sendGameInfo(socket, stats.game, false);
     sendGameInfo(socket, stats.game, true);
-    setTimeout(function() { startNewGame(stats.game); }, 60000);
+    setTimeout(function() { startNewGame(stats.game); }, 30000);
+
+    for (id in io.sockets.sockets) {
+        if (io.sockets.sockets.hasOwnProperty(id)) {
+            socket.get('stats', function (err, stats) {
+                stats.checking = null;
+                stats.flipped = [];
+                socket.set('stats', stats);
+            });
+        }
+    }
 }
 
 function startNewGame(game) {
