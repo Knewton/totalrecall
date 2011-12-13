@@ -49,6 +49,13 @@ h1 {
     z-index: 1000;
 }
 
+#losers {
+	text-align: center;
+    font: 18px/24px Verdana;
+    border-top: 1px solid #000;
+    padding-top: 10px;
+}
+
 /* Announce
 ----------------------------------*/
 #messages {

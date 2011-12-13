@@ -168,6 +168,23 @@
         KOI.processors.classes(e, type);
     }
 
+    /**
+     * Returns a text block of the losers and their score.
+     * @param {Object<key, int>} players The players and their scores.
+     */
+    function losers(players) {
+        var l = [],
+            di = [];
+        KOI.each(players, function (p, s) {
+            l.push({player: p, score: s});
+        });
+        l.sort(function (a,b) { b.score - a.score; });
+        KOI.each(l, function (index, d) {
+            di.push(KOI.format("{0.player}: {0.score}", d));
+        }); 
+        return di.join("<br/>");
+    }
+
     //------------------------------
     //
     // Event bindings
@@ -230,6 +247,7 @@
             KOI.processors.classes(KOI.getElements("#winner-screen"), "");     
             KOI.processors.text(KOI.getElements("#winner-name"), 
                 data.state.winner);     
+            KOI.processors.text(KOI.getElements("#losers"), losers(data.players));
         } else {
             KOI.processors.classes(KOI.getElements("#winner"), "hide");     
             KOI.processors.classes(KOI.getElements("#winner-screen"), "hide");     
