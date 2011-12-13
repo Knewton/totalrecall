@@ -80,10 +80,10 @@ function handleVictory(socket, stats) {
 
     for (id in io.sockets.sockets) {
         if (io.sockets.sockets.hasOwnProperty(id)) {
-            socket.get('stats', function (err, stats) {
+            io.sockets.sockets[id].get('stats', function (err, stats) {
                 stats.checking = null;
                 stats.flipped = [];
-                socket.set('stats', stats);
+                io.sockets.sockets[id].set('stats', stats);
             });
         }
     }
