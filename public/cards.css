@@ -9,3 +9,42 @@
 .skin-colors .card-5 .front { background-color: #F0F; }
 .skin-colors .card-6 .front { background-color: #FFF; }
 .skin-colors .card-7 .front { background-color: #0FF; }
+
+/* Planets
+----------------------------------*/
+.skin-planets .card .back, .skin-planets .card .front { 
+	background-position: center center; 
+	background-color: #000;
+	background-repeat: no-repeat;
+}
+.skin-planets .card  .back { background-image: url(planets/galaxy.jpg); }
+.skin-planets .card-0 .front { background-image: url(planets/mercury.jpg); }
+.skin-planets .card-1 .front { background-image: url(planets/venus.jpg); }
+.skin-planets .card-2 .front { background-image: url(planets/earth.jpg); }
+.skin-planets .card-3 .front { background-image: url(planets/mars.jpg); }
+.skin-planets .card-4 .front { background-image: url(planets/jupiter.jpg); }
+.skin-planets .card-5 .front { background-image: url(planets/saturn.jpg); }
+.skin-planets .card-6 .front { background-image: url(planets/uranus.jpg); }
+.skin-planets .card-7 .front { background-image: url(planets/neptune.jpg); }
+
+/* Minecraft
+----------------------------------*/
+.skin-minecraft .card .back { 
+	background-position: center center; 
+	background-color: #FFF;
+	background-repeat: no-repeat;
+}
+.skin-minecraft .card .front { 
+	background-position: center center; 
+	background-color: #CCC;
+	background-repeat: no-repeat;
+}
+.skin-minecraft .card  .back { background-image: url(minecraft/shovel.gif); }
+.skin-minecraft .card-0 .front { background-image: url(minecraft/grass.png); }
+.skin-minecraft .card-1 .front { background-image: url(minecraft/stone.png); }
+.skin-minecraft .card-2 .front { background-image: url(minecraft/lava.png); }
+.skin-minecraft .card-3 .front { background-image: url(minecraft/water.png); }
+.skin-minecraft .card-4 .front { background-image: url(minecraft/wood.gif); }
+.skin-minecraft .card-5 .front { background-image: url(minecraft/pumpkin.png); }
+.skin-minecraft .card-6 .front { background-image: url(minecraft/ice.png); }
+.skin-minecraft .card-7 .front { background-image: url(minecraft/cactus.png); }

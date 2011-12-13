@@ -33,6 +33,12 @@
     //------------------------------
 
         /**
+         * The name of the current player.
+         * @type {string}
+         */
+        current_player,
+
+        /**
          * The socket connection.
          * @type {Socket}
          */
@@ -105,10 +111,11 @@
      * @param {boolean} remember Should this game be remembered? Default false.
      */
     function joinGame(username, game, remember) {
+        current_player = username;
         enableForm(false);
         socket.emit("enter-game", {
             name: game,
-            player: username + (new Date()).valueOf()
+            player: username
         });
         if (Boolean(remember)) {
             storage.set("username", username);
@@ -166,13 +173,15 @@
     function joinSubmitHandler(event) {
         KOI.stopEvent(event);
         var username = KOI.getElements("#username").value,
-            game = KOI.getElements("#game").value;
+            game = KOI.getElements("#game").value,
+            theme = KOI.getElements("#theme").value;
         if (KOI.isEmpty(username)) {
             return alert("You must enter a username");
         }
         if (KOI.isEmpty(game)) {
             return alert("You must enter a game");
         }
+        KOI.processors.classes(document.body, KOI.format("skin-{}", theme));
         joinGame(username, game, true);
     }
 
@@ -197,10 +206,9 @@
 
     /**
      * Get game info.
-     * @param {Object} The game info.
+     * @param {Object} data The game info.
      */
     socket.on("game-info", function (data) {
-        generateBoard();
         KOI.processors.text(KOI.getElements("#title"), 
             KOI.format("[{}] Total Recall", data.name));
         KOI.processors.classes(KOI.getElements("#join"), "hide");
@@ -209,12 +217,27 @@
 
     /**
      * Get the flip info.
-     * @param {Object} The game state.
+     * @param {Object} data The game state.
      */
     socket.on("card-flipped", function (data) {
         flip(data.flipover);
+        if (data.add_point) {
+            // Update the current_player's points
+        }
     });
 
+    /**
+     * Display an announcement from the server.
+     * @param {string} data The announcement.
+     */
+    socket.on("announcement", function (data) {
+        console.log(data);
+    });
+
+    /**
+     * Get the flipback info.
+     * @param {Object} data The flipback info.
+     */
     socket.on("card-flipback", function (data) {
         if (KOI.isValid(data.flipover)) {
             flip(data.flipover);
@@ -234,6 +257,7 @@
      * Setup the game.
      */
     KOI.bind("DOMReady", function () {
+        generateBoard();
         KOI.processors.classes(KOI.getElements("#cards"), "hide");
         KOI.listen(KOI.getElements("#join"), "submit", joinSubmitHandler);
         KOI.processors.text(KOI.getElements("#title"), "Total Recall");

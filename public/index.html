@@ -24,7 +24,7 @@
 	<script src="store.js" type="text/javascript" charset="utf-8"></script>
 	<script src="game.js" type="text/javascript" charset="utf-8"></script>
 </head>
-<body class="skin-colors">
+<body>
 	<div id="wrapper">
 		<h1 id="title"></h1>
 		<div id="cards"></div>
@@ -36,6 +36,14 @@
 			<div class="form-section">
 				<label for="game">Game to join</label>
 				<input type="text" id="game" class="form-field" />
+			</div>
+			<div class="form-section">
+				<label for="theme">Cards to use</label>
+				<select id="theme" class="form-field">
+					<option value="colors" selected="selected">Colors</option>
+					<option value="minecraft">Minecraft</option>
+					<option value="planets">Planets</option>
+				</select>
 			</div>
 			<div class="form-section clearfix">
 				<button type="submit" class="form-field button">Join Game</button>
