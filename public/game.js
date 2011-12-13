@@ -222,6 +222,7 @@
      */
     socket.on("game-info", function (data) {
         if (KOI.isValid(data.state.winner)) {
+            setMessage("The next game begins soon!", "message");
             KOI.each(KOI.getElements("card"), function (index, e) {
                 KOI.processors.classes(e, "");
             });
@@ -230,6 +231,7 @@
             KOI.processors.text(KOI.getElements("#winner-name"), 
                 data.state.winner);     
         } else {
+            setMessage("Game started!", "message");
             KOI.processors.classes(KOI.getElements("#winner"), "hide");     
             KOI.processors.classes(KOI.getElements("#winner-screen"), "hide");     
         }
@@ -246,7 +248,7 @@
     socket.on("card-flipped", function (data) {
         flip(data.flipover);
         if (data.add_point) {
-            // Update the current_player's points
+            setMessage("You have earned a point!", "message");
         }
     });
 
