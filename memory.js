@@ -70,7 +70,7 @@ function playerIsVictorious(stats) {
 function handleVictory(socket, stats) {
     games[stats.game].exposed.state = {
         winner: stats.name,
-        next_game: new Date((Math.floor(new Date().getTime() / 1000) + 60) * 1000).valueOf()
+        next_game: new Date((Math.floor(new Date().getTime() / 1000) + 60) * 1000).valueOf() / 1000
     }
 
     // Send victory game info to both winner and everyone else
@@ -83,6 +83,15 @@ function startNewGame(game) {
     games[game].exposed.state = {
         started: Math.round((new Date()).valueOf() / 1000)
     };
+
+    // Reset scores to 0
+    for (player in games[game].exposed.players) {
+        if (games[game].exposed.players.hasOwnProperty(player)) {
+            games[game].exposed.players[player] = 0;
+        }
+    }
+
+    games[game].hidden.cards = generateCards(8, 12);
 
     var exposed = games[game].exposed;
     exposed.name = exposed.name.replace(/^game_/, '');
