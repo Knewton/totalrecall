@@ -81,9 +81,11 @@ function handleVictory(socket, stats) {
     for (id in io.sockets.sockets) {
         if (io.sockets.sockets.hasOwnProperty(id)) {
             io.sockets.sockets[id].get('stats', function (err, stats) {
-                stats.checking = null;
-                stats.flipped = [];
-                io.sockets.sockets[id].set('stats', stats);
+                if (stats !== null) {
+                    stats.checking = null;
+                    stats.flipped = [];
+                    io.sockets.sockets[id].set('stats', stats);
+                }
             });
         }
     }
