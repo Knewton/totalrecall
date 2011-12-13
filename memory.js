@@ -64,7 +64,7 @@ function sendGameInfo(socket, game, broadcast) {
 }
 
 function playerIsVictorious(stats) {
-    return stats.flipped.length === (games[stats.game].hidden.cards.length / 2);
+    return stats.flipped.length === (games[stats.game].hidden.card_count / 2);
 }
 
 app.use(app.router);
@@ -229,6 +229,7 @@ io.sockets.on('connection', function (socket) {
 
                         // Check for player victory and let players know if it happened
                         if (playerIsVictorious(stats)) {
+                            socket.emit('announcement', "You won the game!");
                             socket.broadcast.to(stats.game).emit('announcement', stats.name + " won the game!");
                         }
                     });
