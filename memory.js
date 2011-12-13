@@ -50,31 +50,33 @@ function getCard(game, coords) {
     return games[game].hidden.cards[coords.x][coords.y];
 }
 
+function playerIsVictorious(stats) {
+    return stats.flipped.length === (games[stats.game].hidden.cards.length / 2);
+}
+
 app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 
 app.listen(3000);
 
 io.sockets.on('connection', function (socket) {
-/*
+
     socket.on('disconnect', function () {
-        socket.get('name', function (err, player) {
-            socket.get('game', function (err, game) {
-                socket.leave(game);
-                socket.broadcast.to(game).emit(player + " left the game.");
+        socket.get('stats', function (err, stats) {
+            socket.leave(stats.game);
+            socket.broadcast.to(stats.game).emit('announcement', stats.name + " left the game.");
 
-                var new_players = {};
-                for (player_name in games[game].exposed.players) {
-                    if (games[game].exposed.players.hasOwnProperty(player_name) && player_name !== player) {
-                        new_players[player_name] = games[game].exposed.players[player_name];
-                    }
+            var new_players = {};
+            for (player_name in games[stats.game].exposed.players) {
+                if (games[stats.game].exposed.players.hasOwnProperty(player_name) && player_name !== stats.name) {
+                    new_players[player_name] = games[stats.game].exposed.players[player_name];
                 }
+            }
 
-                games[game].exposed.players = new_players;
-            });
+            games[stats.game].exposed.players = new_players;
         });
     });
-*/
+
     // Player entered the game.
     socket.on('enter-game', function (data) {
         data.name = 'game_' + data.name;
@@ -152,7 +154,7 @@ io.sockets.on('connection', function (socket) {
                         // Player gets a point
                         games[stats.game].exposed.players[stats.name]++;
 
-                        socket.broadcast.to(stats.game).emit(stats.name + " got a point!");
+                        socket.broadcast.to(stats.game).emit('announcement', stats.name + " got a point!");
 
                         // Evil code: pick a random other player and a random flipped pair
                         var candidates = [],
@@ -195,11 +197,14 @@ io.sockets.on('connection', function (socket) {
                         // Tell the client what to flip
                         socket.emit('card-flipped', {
                             flipover: [
-                                // Don't flip the previously clicked card, it's already flipped
-                                // [checking.x, checking.y],
                                 [data.x, data.y, card_identity]
                             ]
                         });
+
+                        // Check for player victory and let players know if it happened
+                        if (playerIsVictorious(stats)) {
+                            socket.broadcast.to(stats.game).emit('announcement', stats.name + " won the game!");
+                        }
                     });
                         
                 } else {
