@@ -67,6 +67,28 @@ function playerIsVictorious(stats) {
     return stats.flipped.length === (games[stats.game].hidden.card_count / 2);
 }
 
+function handleVictory(socket, stats) {
+    games[stats.game].exposed.state = {
+        winner: stats.name,
+        next_game: new Date((Math.floor(new Date().getTime() / 1000) + 60) * 1000).valueOf()
+    }
+
+    // Send victory game info to both winner and everyone else
+    sendGameInfo(socket, stats.game, false);
+    sendGameInfo(socket, stats.game, true);
+    setTimeout(function() { startNewGame(stats.game); }, 60000);
+}
+
+function startNewGame(game) {
+    games[game].exposed.state = {
+        started: Math.round((new Date()).valueOf() / 1000)
+    };
+
+    var exposed = games[game].exposed;
+    exposed.name = exposed.name.replace(/^game_/, '');
+    io.sockets.in(game).emit('game-info', games[game].exposed);
+}
+
 app.use(app.router);
 app.use(express.static(__dirname + '/public'));
 
@@ -104,8 +126,10 @@ io.sockets.on('connection', function (socket) {
             games[data.name] = {
                 exposed: {
                     name: data.name,
-                    started: Math.round((new Date()).valueOf() / 1000),
-                    players: {}
+                    players: {},
+                    state: {
+                        started: Math.round((new Date()).valueOf() / 1000)
+                    }
                 },
                 hidden: {
                     cards: generateCards(8, 12),
@@ -229,6 +253,7 @@ io.sockets.on('connection', function (socket) {
 
                         // Check for player victory and let players know if it happened
                         if (playerIsVictorious(stats)) {
+                            handleVictory(socket, stats);
                             socket.emit('announcement', "You won the game!");
                             socket.broadcast.to(stats.game).emit('announcement', stats.name + " won the game!");
                         }
