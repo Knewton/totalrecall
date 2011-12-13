@@ -95,12 +95,13 @@
      * @param {boolean} enable Disables the form if false.
      */
     function enableForm(enable) {
-        var state = "";
-        if (KOI.isValid(enable) && !Boolean(enable)) {
-            state = "disabled";
-        }
+        enable = !KOI.isValid(enable) || Boolean(enable);
         KOI.each(KOI.getElements("form-field"), function (index, e) {
-            e.setAttribute("disabled", state);
+            if (enable) {
+                e.removeAttribute("disabled");
+            } else {
+                e.setAttribute("disabled", "disabled");
+            }
         });
     }
 
@@ -154,6 +155,17 @@
                 KOI.getElements(KOI.format("#x{}-y{}", card[0], card[1])), 
                 unflip ? "" : KOI.format("flip card-{}", card[2]));
         });
+    }
+
+    /**
+     * Set a message.
+     * @param {string} message The message to display.
+     * @param {string} type The class to apply.
+     */
+    function setMessage(message, type) {
+        var e = KOI.getElements("#messages");
+        KOI.processors.text(e, message);
+        KOI.processors.classes(e, type);
     }
 
     //------------------------------
@@ -231,7 +243,16 @@
      * @param {string} data The announcement.
      */
     socket.on("announcement", function (data) {
-        console.log(data);
+        setMessage(data, "message");
+    });
+
+    /**
+     * Display an error from the server.
+     * @param {string} data The error.
+     */
+    socket.on("error", function (data) {
+        enableForm();
+        setMessage(data, "error");
     });
 
     /**

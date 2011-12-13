@@ -116,7 +116,7 @@ io.sockets.on('connection', function (socket) {
 
             // Player name is taken. Just stop.
             if (data.player in games[data.name].exposed.players) {
-                socket.emit('error', "Player name " + player + " is taken.");
+                socket.emit('error', "Player name " + data.player + " is taken.");
                 return;
             }
 

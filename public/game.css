@@ -11,13 +11,34 @@
 ----------------------------------*/
 #wrapper {
 	width: 960px;
-	margin: 15px auto 0;
+	margin: 65px auto 0;
 }
 
 h1 {
 	font: bold 38px/42px Verdana;
 	text-align: center;
 	margin-bottom: 20px;
+}
+
+/* Announce
+----------------------------------*/
+#messages {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 20px;
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    font: bold 24px/20px Verdana;
+}
+
+.message {
+    background: #DDC;
+}
+
+.error {
+    background: #DCC;
 }
 
 /* System
